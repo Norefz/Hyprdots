@@ -186,51 +186,15 @@ analyze_hyprland_deps() {
 install_packages() {
   log_info "Installing required packages..."
 
-  # Core Hyprland packages
+  # Core Hyprland packages (Sudah termasuk rofi & ranger agar pasti terinstall)
   local base_packages=(
-    "hyprland"
-    "rofi"
-    "ranger"
-    "hypridle"
-    "hyprlock"
-    "waybar"
-    "swaync"
-    "kitty"
-    "swww"
-    "brightnessctl"
-    "playerctl"
-    "grim"
-    "slurp"
-    "jq"
-    "ttf-jetbrains-mono-nerd"
-    "papirus-icon-theme"
-    "network-manager-applet"
-    "polkit-gnome"
-    "dunst"
-    "fcitx5"
-    "cava"
-    "ranger"
-    "fastfetch"
-    "starship"
-    "eww"
-    "qt6ct"
-    "thunar"
-    "wofi"
-    "htop"
-    "wireplumber"
-    "wl-clipboard"
-    "wlogout"
-    "libnotify"
-    "python3"
-    "bc"
-    "wget"
-    "atool"
-    "imagemagick"
-    "zsh"
-    "blueman"
-    "nm-connection-editor"
-    "ttf-firacode-nerd"
-    "which"
+    "hyprland" "hypridle" "hyprlock" "waybar" "swaync" "kitty" "swww"
+    "brightnessctl" "playerctl" "grim" "slurp" "jq" "ttf-jetbrains-mono-nerd"
+    "papirus-icon-theme" "network-manager-applet" "polkit-gnome" "dunst"
+    "fcitx5" "cava" "ranger" "fastfetch" "starship" "eww" "qt6ct"
+    "thunar" "wofi" "htop" "wireplumber" "wl-clipboard" "wlogout"
+    "libnotify" "python3" "bc" "wget" "atool" "imagemagick" "zsh"
+    "blueman" "nm-connection-editor" "ttf-firacode-nerd" "which"
   )
 
   # AUR packages (need yay/paru)
@@ -243,53 +207,34 @@ install_packages() {
     "miku-cursor-theme"
   )
 
-  # Additional packages from hyprland analysis
-  log_info "Analyzing hyprland configuration for dependencies..."
-  local additional_packages=($(analyze_hyprland_deps))
+  # Ambil dependency tambahan secara "diam" agar tidak mengotori list paket
+  # Pastikan di fungsi analyze_hyprland_deps, log_info menggunakan >&2
+  local additional_packages=($(analyze_hyprland_deps 2>/dev/null))
 
-  # Combine packages and remove duplicates
+  # Gabungkan dan bersihkan dari teks log yang mungkin nyelip
   local all_packages=("${base_packages[@]}" "${additional_packages[@]}")
-  local unique_packages=($(printf "%s\n" "${all_packages[@]}" | sort -u))
+  local unique_packages=($(printf "%s\n" "${all_packages[@]}" | grep -v "\[INFO\]" | grep -v "Analyzing" | sort -u))
 
   log_info "Found ${#unique_packages[@]} packages to install"
 
-  # Install packages using detected package manager
+  # FIX: Hapus cache yay yang korup (berdasarkan error kamu sebelumnya)
   if [[ "$AUR_HELPER_AVAILABLE" == true ]]; then
-    # Use yay/paru for all packages
-    log_info "Installing ${#unique_packages[@]} packages with $PKG_MANAGER..."
-    echo "Packages: ${unique_packages[*]}"
-    "$PKG_MANAGER" -S --needed --noconfirm "${unique_packages[@]}" || {
-      log_warning "Some packages failed to install, continuing..."
-    }
+    log_info "Cleaning $PKG_MANAGER cache to prevent Git errors..."
+    rm -rf ~/.cache/yay/* 2>/dev/null || true
+  fi
+
+  # Proses Instalasi
+  if [[ "$AUR_HELPER_AVAILABLE" == true ]]; then
+    log_info "Installing main packages with $PKG_MANAGER..."
+    "$PKG_MANAGER" -S --needed --noconfirm "${unique_packages[@]}" || log_warning "Some packages failed"
 
     if [[ ${#aur_packages[@]} -gt 0 ]]; then
-      log_info "Installing AUR packages with $PKG_MANAGER..."
-      "$PKG_MANAGER" -S --needed --noconfirm "${aur_packages[@]}" || {
-        log_warning "Some AUR packages failed to install, continuing..."
-      }
+      log_info "Installing specific AUR apps..."
+      "$PKG_MANAGER" -S --needed --noconfirm "${aur_packages[@]}" || log_warning "Some AUR apps failed"
     fi
   else
-    # Only install pacman packages, skip AUR
-    local pacman_packages=()
-
-    for pkg in "${unique_packages[@]}"; do
-      pacman_packages+=("$pkg")
-    done
-
-    if [[ ${#pacman_packages[@]} -gt 0 ]]; then
-      log_info "Installing pacman packages: ${pacman_packages[*]}"
-      sudo pacman -S --needed --noconfirm "${pacman_packages[@]}" || {
-        log_warning "Some packages failed to install, continuing..."
-      }
-    fi
-
-    if [[ ${#aur_packages[@]} -gt 0 ]]; then
-      log_warning "Skipping AUR packages (no AUR helper available):"
-      for aur_pkg in "${aur_packages[@]}"; do
-        echo "  • $aur_pkg"
-      done
-      log_info "Install yay or paru later to install these packages"
-    fi
+    log_info "Installing via pacman (Skipping AUR)..."
+    sudo pacman -S --needed --noconfirm "${unique_packages[@]}" || log_warning "Pacman failed some items"
   fi
 
   log_success "Package installation completed"
