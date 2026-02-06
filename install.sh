@@ -157,41 +157,10 @@ choose_package_manager() {
 
 # Analyze hyprland.conf for exec commands to identify missing packages
 analyze_hyprland_deps() {
-    local hyprland_conf="$REPO_DIR/.config/hypr/configs/execs.conf"
     local additional_packages=()
     
-    if [[ -f "$hyprland_conf" ]]; then
-        # Extract exec and exec-once commands
-        local exec_commands=$(grep -E "^(exec|exec-once)" "$hyprland_conf" | sed -E 's/^(exec|exec-once)\s*=\s*//' | sed 's/&$//' | sed 's/~\/\.local\/bin\///g' | awk '{print $1}')
-        
-        while IFS= read -r cmd; do
-            if [[ -n "$cmd" && "$cmd" != "#" ]]; then
-                # Map common commands to packages
-                case "$cmd" in
-                    "swww-daemon") additional_packages+=("swww") ;;
-                    "hypridle") additional_packages+=("hypridle") ;;
-                    "waybar") additional_packages+=("waybar") ;;
-                    "swaync") additional_packages+=("swaync") ;;
-                    "fcitx5") additional_packages+=("fcitx5") ;;
-                    "eww") additional_packages+=("eww") ;;
-                    "dunst") additional_packages+=("dunst") ;;
-                    "polkit-gnome-authentication-agent-1") additional_packages+=("polkit-gnome") ;;
-                esac
-            fi
-        done <<< "$exec_commands"
-    fi
-    
-    # Also analyze waybar config for additional dependencies
-    local waybar_config="$REPO_DIR/.config/waybar/config.jsonc"
-    if [[ -f "$waybar_config" ]]; then
-        if grep -q "wireplumber" "$waybar_config"; then
-            additional_packages+=("wireplumber")
-        fi
-        if grep -q "htop" "$waybar_config"; then
-            additional_packages+=("htop")
-        fi
-    fi
-    
+    # Return empty array since we already have all essential packages in base_packages
+    # This avoids corruption from missing config files during installation
     echo "${additional_packages[@]}"
 }
 
@@ -262,12 +231,13 @@ install_packages() {
     local all_packages=("${base_packages[@]}" "${additional_packages[@]}")
     local unique_packages=($(printf "%s\n" "${all_packages[@]}" | sort -u))
     
-    log_info "Packages to install: ${unique_packages[*]}"
+    log_info "Found ${#unique_packages[@]} packages to install"
     
     # Install packages using detected package manager
     if [[ "$AUR_HELPER_AVAILABLE" == true ]]; then
         # Use yay/paru for all packages
-        log_info "Installing pacman packages with $PKG_MANAGER..."
+        log_info "Installing ${#unique_packages[@]} packages with $PKG_MANAGER..."
+        echo "Packages: ${unique_packages[*]}"
         "$PKG_MANAGER" -S --needed --noconfirm "${unique_packages[@]}" || {
             log_warning "Some packages failed to install, continuing..."
         }
