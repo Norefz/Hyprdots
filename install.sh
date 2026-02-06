@@ -105,8 +105,6 @@ choose_package_manager() {
 
 # Analyze hyprland.conf for exec commands to identify missing packages
 analyze_hyprland_deps() {
-    log_info "Analyzing hyprland configuration for dependencies..."
-    
     local hyprland_conf="$REPO_DIR/.config/hypr/configs/execs.conf"
     local additional_packages=()
     
@@ -205,6 +203,7 @@ install_packages() {
     )
     
     # Additional packages from hyprland analysis
+    log_info "Analyzing hyprland configuration for dependencies..."
     local additional_packages=($(analyze_hyprland_deps))
     
     # Combine packages and remove duplicates
