@@ -45,61 +45,113 @@ check_arch() {
     log_success "Arch Linux detected"
 }
 
-# Let user choose package manager
+# Let user choose package manager with better UX
 choose_package_manager() {
     log_info "Choosing AUR package manager..."
     
+    local aurList=("yay" "paru" "yay-bin" "paru-bin")
     local yay_available=false
     local paru_available=false
     
-    if command -v yay &> /dev/null; then
-        yay_available=true
-    fi
+    # Check available helpers
+    for helper in "${aurList[@]}"; do
+        if command -v "$helper" &> /dev/null; then
+            if [[ "$helper" == yay* ]]; then
+                yay_available=true
+            elif [[ "$helper" == paru* ]]; then
+                paru_available=true
+            fi
+        fi
+    done
     
-    if command -v paru &> /dev/null; then
-        paru_available=true
-    fi
-    
+    # If multiple available, let user choose
     if [[ "$yay_available" == true && "$paru_available" == true ]]; then
-        echo -e "${YELLOW}Both yay and paru are available. Please choose your preferred AUR helper:${NC}"
-        echo "1) yay (Recommended)"
-        echo "2) paru"
+        echo -e "${YELLOW}Multiple AUR helpers available. Please choose:${NC}"
+        for i in "${!aurList[@]}"; do
+            if command -v "${aurList[$i]}" &> /dev/null; then
+                echo "$((i+1))) ${aurList[$i]} ✓"
+            else
+                echo "$((i+1))) ${aurList[$i]}"
+            fi
+        done
+        echo "0) Skip AUR packages"
         
         while true; do
-            read -p "Enter your choice [1-2]: " choice
+            read -p "Enter option [default: 1] | q to quit: " choice
+            choice=${choice:-1}
             case $choice in
-                1)
-                    PKG_MANAGER="yay"
-                    AUR_HELPER_AVAILABLE=true
-                    log_success "Selected yay as package manager"
+                q|Q)
+                    log_info "Quitting..."
+                    exit 0
+                    ;;
+                0)
+                    PKG_MANAGER="pacman"
+                    AUR_HELPER_AVAILABLE=false
+                    log_warning "Skipping AUR packages"
                     break
                     ;;
-                2)
-                    PKG_MANAGER="paru"
-                    AUR_HELPER_AVAILABLE=true
-                    log_success "Selected paru as package manager"
-                    break
+                [1-4])
+                    if [[ $choice -le ${#aurList[@]} ]]; then
+                        selected_helper="${aurList[$((choice-1))]}"
+                        if command -v "$selected_helper" &> /dev/null; then
+                            PKG_MANAGER="$selected_helper"
+                            AUR_HELPER_AVAILABLE=true
+                            log_success "Selected $selected_helper"
+                            break
+                        else
+                            log_warning "$selected_helper not installed"
+                        fi
+                    else
+                        echo -e "${RED}Invalid option. Please enter 0-4.${NC}"
+                    fi
                     ;;
                 *)
-                    echo -e "${RED}Invalid choice. Please enter 1 or 2.${NC}"
+                    echo -e "${RED}Invalid option. Please enter 0-4 or q.${NC}"
                     ;;
             esac
         done
-    elif [[ "$yay_available" == true ]]; then
-        PKG_MANAGER="yay"
-        AUR_HELPER_AVAILABLE=true
-        log_success "Using yay as package manager"
-    elif [[ "$paru_available" == true ]]; then
-        PKG_MANAGER="paru"
-        AUR_HELPER_AVAILABLE=true
-        log_success "Using paru as package manager"
     else
-        PKG_MANAGER="pacman"
-        AUR_HELPER_AVAILABLE=false
-        log_warning "No AUR helper found. AUR packages will be skipped."
-        log_info "To install AUR packages later, run:"
-        echo "  sudo pacman -S git base-devel"
-        echo "  cd /tmp && git clone https://aur.archlinux.org/yay.git && cd yay && makepkg -si"
+        # Install yay if no helpers found
+        echo -e "${YELLOW}No AUR helper found. Install yay? (Recommended)${NC}"
+        echo "1) Install yay"
+        echo "2) Skip AUR packages"
+        
+        while true; do
+            read -p "Enter option [default: 1] | q to quit: " choice
+            choice=${choice:-1}
+            case $choice in
+                q|Q)
+                    log_info "Quitting..."
+                    exit 0
+                    ;;
+                1)
+                    log_info "Installing yay..."
+                    if sudo pacman -S --needed --noconfirm git base-devel && \
+                       cd /tmp && \
+                       git clone https://aur.archlinux.org/yay.git && \
+                       cd yay && \
+                       makepkg -si --noconfirm; then
+                        PKG_MANAGER="yay"
+                        AUR_HELPER_AVAILABLE=true
+                        log_success "yay installed successfully"
+                    else
+                        PKG_MANAGER="pacman"
+                        AUR_HELPER_AVAILABLE=false
+                        log_warning "yay installation failed, continuing without AUR"
+                    fi
+                    break
+                    ;;
+                2)
+                    PKG_MANAGER="pacman"
+                    AUR_HELPER_AVAILABLE=false
+                    log_warning "Skipping AUR packages"
+                    break
+                    ;;
+                *)
+                    echo -e "${RED}Invalid option. Please enter 1, 2, or q.${NC}"
+                    ;;
+            esac
+        done
     fi
 }
 
@@ -357,63 +409,96 @@ make_scripts_executable() {
     log_success "All shell scripts are now executable"
 }
 
-# Setup Zsh as default shell
-setup_zsh() {
-    log_info "Setting up Zsh as default shell..."
+# Let user choose and setup shell
+setup_shell() {
+    log_info "Setting up shell..."
     
-    # Check if zsh is installed
-    if ! command -v zsh &> /dev/null; then
-        log_warning "Zsh is not installed. Installing zsh..."
-        sudo pacman -S --needed --noconfirm zsh
+    local shlList=("zsh" "fish" "bash")
+    
+    echo -e "${YELLOW}Choose your default shell:${NC}"
+    for i in "${!shlList[@]}"; do
+        if [[ "$SHELL" == */${shlList[$i]} ]]; then
+            echo "$((i+1))) ${shlList[$i]} (current) ✓"
+        else
+            echo "$((i+1))) ${shlList[$i]}"
+        fi
+    done
+    
+    while true; do
+        read -p "Enter option [default: 1] | q to quit: " choice
+        choice=${choice:-1}
+        case $choice in
+            q|Q)
+                log_info "Skipping shell setup..."
+                return 0
+                ;;
+            [1-3])
+                if [[ $choice -le ${#shlList[@]} ]]; then
+                    selected_shell="${shlList[$((choice-1))]}"
+                    break
+                else
+                    echo -e "${RED}Invalid option. Please enter 1-3.${NC}"
+                fi
+                ;;
+            *)
+                echo -e "${RED}Invalid option. Please enter 1-3 or q.${NC}"
+                ;;
+        esac
+    done
+    
+    # Install selected shell if not present
+    if ! command -v "$selected_shell" &> /dev/null; then
+        log_info "Installing $selected_shell..."
+        if sudo pacman -S --needed --noconfirm "$selected_shell"; then
+            log_success "$selected_shell installed successfully"
+        else
+            log_warning "Failed to install $selected_shell"
+            return 1
+        fi
     fi
     
-    # Get current shell
-    local current_shell=$(echo "$SHELL")
-    
-    # Change default shell to zsh if not already zsh
-    if [[ "$current_shell" != */zsh ]]; then
-        log_info "Changing default shell from $(basename "$current_shell") to zsh..."
-        if command -v zsh &> /dev/null; then
-            # Get the full path to zsh without using 'which'
-            local zsh_path=""
-            if [[ -x "/bin/zsh" ]]; then
-                zsh_path="/bin/zsh"
-            elif [[ -x "/usr/bin/zsh" ]]; then
-                zsh_path="/usr/bin/zsh"
+    # Change default shell if different from current
+    local current_shell=$(basename "$SHELL")
+    if [[ "$current_shell" != "$selected_shell" ]]; then
+        log_info "Changing default shell from $current_shell to $selected_shell..."
+        
+        # Get full path without using which
+        local shell_path=""
+        if [[ -x "/bin/$selected_shell" ]]; then
+            shell_path="/bin/$selected_shell"
+        elif [[ -x "/usr/bin/$selected_shell" ]]; then
+            shell_path="/usr/bin/$selected_shell"
+        else
+            shell_path=$(command -v "$selected_shell")
+        fi
+        
+        if [[ -n "$shell_path" ]]; then
+            if chsh -s "$shell_path"; then
+                log_success "Default shell changed to $selected_shell"
             else
-                # Use command -v as fallback
-                zsh_path=$(command -v zsh)
-            fi
-            
-            if [[ -n "$zsh_path" ]]; then
-                chsh -s "$zsh_path" || {
-                    log_error "Failed to change shell. You may need to run 'chsh -s $zsh_path' manually."
-                    return 1
-                }
-                log_success "Default shell changed to zsh"
-            else
-                log_error "Could not determine zsh path. Cannot change shell."
-                return 1
+                log_warning "Failed to change shell. You may need to run 'chsh -s $shell_path' manually."
             fi
         else
-            log_error "zsh not found in PATH. Cannot change shell."
+            log_error "Could not determine $selected_shell path."
             return 1
         fi
     else
-        log_info "Zsh is already the default shell"
+        log_info "$selected_shell is already the default shell"
     fi
     
-    # Link .zshrc if it exists in .config
-    if [[ -f "$REPO_DIR/.config/.zshrc" ]]; then
-        log_info "Linking .zshrc configuration..."
-        if [[ -f "$HOME/.zshrc" && ! -L "$HOME/.zshrc" ]]; then
-            mv "$HOME/.zshrc" "$BACKUP_DIR/.zshrc" 2>/dev/null || true
+    # Link shell config if it exists
+    local config_file=".${selected_shell}rc"
+    if [[ -f "$REPO_DIR/.config/$config_file" ]]; then
+        log_info "Linking $config_file..."
+        if [[ -f "$HOME/$config_file" && ! -L "$HOME/$config_file" ]]; then
+            mkdir -p "$BACKUP_DIR"
+            mv "$HOME/$config_file" "$BACKUP_DIR/" 2>/dev/null || true
         fi
-        ln -sf "$REPO_DIR/.config/.zshrc" "$HOME/.zshrc"
-        log_success ".zshrc linked successfully"
+        ln -sf "$REPO_DIR/.config/$config_file" "$HOME/$config_file"
+        log_success "$config_file linked successfully"
     fi
     
-    log_success "Zsh setup completed"
+    log_success "Shell setup completed"
 }
 
 # Install Python packages
@@ -488,31 +573,46 @@ link_scripts_to_bin() {
     log_success "Scripts linked to ~/.local/bin/"
 }
 
-# Create necessary directories
+# Create necessary directories with better organization
 create_directories() {
     log_info "Creating necessary directories..."
+    
+    # Create log directory first
+    mkdir -p "$HOME/.local/share/logs"
     
     # Create common directories that might be needed
     local directories=(
         "$HOME/.local/share"
         "$HOME/.local/state"
+        "$HOME/.local/bin"
+        "$HOME/.local/bin/scripts"
         "$HOME/.cache"
         "$HOME/.cache/wal"
         "$HOME/.cache/rofi-walls"
-        "$HOME/.config/hypr"
-        "$HOME/.local/bin/scripts"
+        "$HOME/.cache/swww"
         "$HOME/Pictures/Screenshots"
         "$HOME/Pictures/wallpaper"
+        "$HOME/Videos"
+        "$HOME/Documents"
+        "$HOME/Downloads"
+        "$HOME/Templates"
+        "$HOME/Public"
+        "$HOME/Music"
     )
     
+    local created_count=0
     for dir in "${directories[@]}"; do
         if [[ ! -d "$dir" ]]; then
             mkdir -p "$dir"
-            log_info "Created directory: $dir"
+            ((created_count++))
         fi
     done
     
-    log_success "Directories created"
+    if [[ $created_count -gt 0 ]]; then
+        log_success "Created $created_count directories"
+    else
+        log_info "All directories already exist"
+    fi
 }
 
 # Display installation summary
@@ -552,10 +652,10 @@ main() {
     # Run installation steps
     check_arch
     choose_package_manager
+    setup_shell
     create_directories
     install_packages
     install_python_packages
-    setup_zsh
     create_backup
     create_symlinks
     make_scripts_executable
