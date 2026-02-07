@@ -167,10 +167,7 @@ install_packages() {
 
   local aur_packages=(
     "rofi-lbonn-wayland-git"
-    "zen-browser"
-    "vesktop"
-    "whatsdesk"
-    "pywal-discord"
+    "zen-browser-bin"
   )
 
   # Capture dependencies while ignoring log text
