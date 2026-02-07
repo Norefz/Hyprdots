@@ -204,14 +204,13 @@ create_backup() {
   log_info "Backing up existing configs..."
   local backup_created=false
 
-  for folder in "$REPO_DIR/.config"/*; do
-    if [[ -d "$folder" ]]; then
-      local name=$(basename "$folder")
-      local target="$CONFIG_DIR/$name"
-      if [[ -e "$target" && ! -L "$target" ]]; then
-        [[ "$backup_created" == false ]] && mkdir -p "$BACKUP_DIR" && backup_created=true
-        mv "$target" "$BACKUP_DIR/"
-      fi
+  for item in "$REPO_DIR/.config"/*; do
+    local name=$(basename "$item")
+    local target="$CONFIG_DIR/$name"
+
+    if [[ -e "$target" && ! -L "$target" ]]; then
+      [[ "$backup_created" == false ]] && mkdir -p "$BACKUP_DIR" && backup_created=true
+      mv "$target" "$BACKUP_DIR/"
     fi
   done
   [[ "$backup_created" == true ]] && log_success "Backup saved to $BACKUP_DIR"
@@ -220,13 +219,16 @@ create_backup() {
 create_symlinks() {
   log_info "Creating symlinks..."
   mkdir -p "$CONFIG_DIR"
-  for folder in "$REPO_DIR/.config"/*; do
-    if [[ -d "$folder" ]]; then
-      ln -sf "$folder" "$CONFIG_DIR/$(basename "$folder")"
-    fi
+  for item in "$REPO_DIR/.config"/*; do
+    local name=$(basename "$item")
+    local target="$CONFIG_DIR/$name"
+
+    log_info "Linking: $name"
+    ln -sf "$item" "$target"
   done
   # Special case for .zshrc if it exists in .config
   [[ -f "$REPO_DIR/.config/.zshrc" ]] && ln -sf "$REPO_DIR/.config/.zshrc" "$HOME/.zshrc"
+  [[ -f "$REPO_DIR/.config/.starship.toml" ]] && ln -sf "$REPO_DIR/.config/.zshrc" "$HOME/.zshrc"
   log_success "Symlinks created"
 }
 
