@@ -226,6 +226,11 @@ create_symlinks() {
     log_info "Linking: $name"
     ln -sf "$item" "$target"
   done
+  if [[ -d "$REPO_DIR/assets/wallpaper" ]]; then
+    log_info "Linking wallpapers from assets..."
+    mkdir -p "$HOME/Pictures"
+    ln -sf "$REPO_DIR/assets/wallpaper" "$HOME/Pictures/wallpaper"
+  fi
   # Special case for .zshrc if it exists in .config
   [[ -f "$REPO_DIR/.config/.zshrc" ]] && ln -sf "$REPO_DIR/.config/.zshrc" "$HOME/.zshrc"
   [[ -f "$REPO_DIR/.config/.starship.toml" ]] && ln -sf "$REPO_DIR/.config/.zshrc" "$HOME/.zshrc"
