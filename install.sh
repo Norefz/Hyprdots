@@ -216,27 +216,32 @@ create_backup() {
   [[ "$backup_created" == true ]] && log_success "Backup saved to $BACKUP_DIR"
 }
 
-create_symlinks() {
-  log_info "Creating symlinks..."
+copy_configs() {
+  log_info "Copying configuration files to ~/.config..."
   mkdir -p "$CONFIG_DIR"
+
   for item in "$REPO_DIR/.config"/*; do
     local name=$(basename "$item")
-    local target="$CONFIG_DIR/$name"
+    log_info "Copying: $name"
 
-    log_info "Linking: $name"
-    ln -sf "$item" "$target"
+    rm -rf "$CONFIG_DIR/$name"
+
+    cp -rf "$item" "$CONFIG_DIR/"
   done
-  if [[ -d "$REPO_DIR/assets/wallpaper" ]]; then
-    log_info "Linking wallpapers from assets..."
-    mkdir -p "$HOME/Pictures"
-    # if there already folder wallpaper
-    rm -rf "$HOME/Pictures/wallpaper"
 
-    ln -sfn "$REPO_DIR/assets/wallpaper" "$HOME/Pictures/wallpaper"
+  if [[ -f "$REPO_DIR/.config/.zshrc" ]]; then
+    log_info "Copying .zshrc to home directory..."
+    cp -f "$REPO_DIR/.config/.zshrc" "$HOME/.zshrc"
   fi
-  # Special case for .zshrc if it exists in .config
-  [[ -f "$REPO_DIR/.config/.zshrc" ]] && ln -sf "$REPO_DIR/.config/.zshrc" "$HOME/.zshrc"
-  log_success "Symlinks created"
+
+  if [[ -d "$REPO_DIR/assets/wallpaper" ]]; then
+    log_info "Copying wallpapers to ~/Pictures/wallpaper..."
+    mkdir -p "$HOME/Pictures"
+    rm -rf "$HOME/Pictures/wallpaper"
+    cp -rf "$REPO_DIR/assets/wallpaper" "$HOME/Pictures/"
+  fi
+
+  log_success "All files copied physically. You can safely delete the repo folder after this."
 }
 
 make_scripts_executable() {
@@ -284,7 +289,7 @@ main() {
   create_directories
   install_packages
   create_backup
-  create_symlinks
+  copy_configs
   make_scripts_executable
   setup_shell
   display_summary
