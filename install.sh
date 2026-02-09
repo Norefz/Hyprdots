@@ -162,7 +162,7 @@ install_packages() {
     "fcitx5" "cava" "ranger" "fastfetch" "starship" "qt6ct"
     "thunar" "rofi" "htop" "wireplumber" "wl-clipboard" "wlogout"
     "libnotify" "python3" "bc" "wget" "atool" "imagemagick" "zsh"
-    "blueman" "qt6ct" "nvim" "exa" "pokemon-colorscripts-git" "sl" "cmatrix" "nm-connection-editor" "ttf-firacode-nerd" "which"
+    "blueman" "qt6ct" "nvim" "pipewire" "pipewire-pulse" "pipewire-alsa" "pipewire-jack" "wireplumber" "exa" "pokemon-colorscripts-git" "sl" "cmatrix" "nm-connection-editor" "ttf-firacode-nerd" "which"
   )
 
   local aur_packages=(
@@ -328,6 +328,12 @@ generate_initial_wal() {
     log_error "No wallpapers found in $wall_dir. Skipping initialization."
   fi
 }
+setup_audio() {
+  log_info "Enabling Pipewire Audio Services..."
+  # Mengaktifkan service pipewire untuk user saat ini
+  systemctl --user enable --now pipewire.service pipewire-pulse.service wireplumber.service
+  log_success "Audio services (Pipewire) enabled."
+}
 
 display_summary() {
   echo -e "\n${GREEN}========================================${NC}"
@@ -378,6 +384,7 @@ main() {
   generate_initial_wal
   make_scripts_executable
   setup_shell
+  setup_audio
   display_summary
 }
 
