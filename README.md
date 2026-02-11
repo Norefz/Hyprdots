@@ -64,9 +64,6 @@
 
 ---
 
-## My Workflow
-
->- You can change this behavior in your Hyprland input configuration if you prefer the default key layout.
 
 ## Keybindings
 
