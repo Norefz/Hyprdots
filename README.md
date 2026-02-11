@@ -1,75 +1,6 @@
 <h1 align="center">🫟 Hyprdots</h1>
 
-<div align="center">
-<p>
-<a href="https://github.com/ad1822/hyprdots/stargazers"><img src="https://img.shields.io/github/stars/ad1822/hyprdots?style=for-the-badge&logo=starship&color=C9CBFF&logoColor=C9CBFF&labelColor=302D41" alt="stars"><a>&nbsp;&nbsp;
-<!-- <a href="https://github.com/ad1822/hyprdots/"><img src="https://img.shields.io/github/repo-size/ad1822/hyprdots?style=for-the-badge&logo=hyprland&logoColor=f9e2af&label=Size&labelColor=302D41&color=f9e2af" alt="REPO SIZE"></a>&nbsp;&nbsp; -->
-<a href="https://github.com/ad1822/hyprdots/"><img src="https://img.shields.io/github/forks/ad1822/hyprdots?style=for-the-badge&logo=appveyor&logoColor=f9e2af&label=Forks&labelColor=302D41&color=f9e2af" alt="REPO SIZE"></a>&nbsp;&nbsp;
-<a href="https://github.com/ad1822/hyprdots/commits/main/"><img src="https://img.shields.io/github/last-commit/ad1822/hyprdots?style=for-the-badge&logo=github&logoColor=eba0ac&label=Last%20Commit&labelColor=302D41&color=eba0ac" alt="Last Commit"></a>&nbsp;&nbsp;
-<a href="https://github.com/ad1822/hyprdots/blob/main/LICENSE"><img src="https://img.shields.io/github/license/ad1822/hyprdots?style=for-the-badge&logo=&color=CBA6F7&logoColor=CBA6F7&labelColor=302D41" alt="LICENSE"></a>&nbsp;&nbsp;
-</p>
-</div>
 
-<p align="center">
-  <img src="https://raw.githubusercontent.com/catppuccin/catppuccin/main/assets/palette/macchiato.png" width="400" />
-</p>
-<!-- <p align="center">
-  <a href="https://github.com/zemmsoares/awesome-rices">
-    <img src="https://raw.githubusercontent.com/zemmsoares/awesome-rices/main/assets/awesome-rice-badge.svg" alt="awesome-rice-badge">
-  </a>
-</p> -->
-
-<div align="center">
-  <img src="Assets/main.png" alt="main" width="100%"/>
-</div>
-
-<div align="center">
-  <img src="Assets/launcher.png" alt="launcher" width="49%"/>
-  <img src="Assets/powermenu.png" alt="powermenu" width="49%"/>
-</div>
-
-
-<div align="center">
-  <img src="Assets/wallpicker.png" alt="wallpaper rofi" width="49%"/>
-  <img src="Assets/gitlog.png" alt="git log" width="49%"/>
-</div>
-
-<div align="center">
-  <img src="Assets/nvim-obs.png" alt="obs nvim" width="100%"/>
-</div>
-
-<div align="center">
-  <img src="Assets/player.png" alt="player" width="100%"/>
-</div>
-
-<div align="center">
-  <img src="Assets/btop.png" alt="btop" width="100%"/>
-</div>
-
-<div align="center">
-  <img src="Assets/nvim.png" alt="nvim" width="100%"/>
-</div>
-
-<div align="center">
-  <img src="Assets/github.png" alt="github" width="100%"/>
-</div>
-
-<div align="center">
-  <img src="Assets/yazi.png" alt="yazi" width="100%"/>
-</div>
-
-#### My old rice
-
-Change branch of this repo to `old-dotfiles` 
-```bash
-git checkout old-dotfiles
-```
-
-## Wallpapers (Google Drive)
-
-[Wallpapers](https://drive.google.com/drive/folders/1Q1j-Qzx1cU1X8j4xUPrssxn1rgJSnDQO)
-
----
 
 ## 🚀 Quick Installation Guide
 
@@ -77,10 +8,9 @@ git checkout old-dotfiles
 
 - **Window Manager**: Hyprland (Tiling)
 - **Status Bar**: Waybar
-- **Notification Manager**: Dunst
-- **Browser**: Zen
-- **Color Picker**: hyprpicker
-- **Wallpaper Utility**: hyprpaper
+- **Notification Manager**: Swaync
+- **Color Picker**: pywal
+- **Wallpaper Utility**: rofi
 - **Screenshot Utility**: grim + slurp
 - **App Launcher**: Rofi
 - **Terminal Emulator**: kitty
@@ -88,12 +18,9 @@ git checkout old-dotfiles
 - **Media Controls**: playerctl
 - **Power Management**: acpi
 - **Brightness Control**: brightnessctl
-- **Audio Management**: pamixer, PulseAudio
+- **Audio Management**: pamixer, popewire
 - **Network Management**: NetworkManager (nmcli), iwd (iNet Wireless Daemon)
 
-> ℹ️ **For more detailed guidance**, check out [this](./Resources.md)
-
----
 
 ## 🛠️ Installation Steps
 
@@ -112,14 +39,9 @@ git checkout old-dotfiles
 3. **Run the setup script**:
 
    ```sh
-   bash ./setup.sh
+   bash ./install.sh
    ```
 
-4. **GTK Theme Setup**:
-
-- [Catppuccin Gtk theme](https://github.com/catppuccin/gtk/releases)
-
-- I use [`ngw-look`](https://github.com/nwg-piotr/nwg-look) to configure GTK themes and styles.
 
 ---
 
@@ -137,17 +59,11 @@ git checkout old-dotfiles
 
 ---
 
-<p align="center">
-  <img src="https://raw.githubusercontent.com/catppuccin/catppuccin/main/assets/footers/gray0_ctp_on_line.svg?sanitize=true" />
-</p>
-
 ---
 
 ## My Workflow
 
->- My setup remaps Caps Lock → Super (⌘) for faster window management and command access.
 >- You can change this behavior in your Hyprland input configuration if you prefer the default key layout.
->- You can also enable animation in `hyprland`, My configuration have animation, but I have been not fan of animation
 
 ## Keybindings
 
