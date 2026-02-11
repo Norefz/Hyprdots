@@ -1,8 +1,8 @@
-<h1 align="center">🫟 Hyprdots</h1>
+<h1 align="center"> My Hyprdots</h1>
 
 
 
-## 🚀 Quick Installation Guide
+
 
 ### 📦 Programs Included
 
