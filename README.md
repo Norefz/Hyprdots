@@ -36,6 +36,10 @@
 ## Ranger
 ![ranger](https://github.com/user-attachments/assets/265945a7-197f-4073-b161-3c49ce6f6d78)
 
+## Wlogout
+<img width="1920" height="1080" alt="image" src="https://github.com/user-attachments/assets/9dde8425-de6b-4271-996f-186610fea42a" />
+
+
 ## 
 
 
