@@ -1,5 +1,9 @@
 <h1 align="center"> My Hyprdots</h1>
 
+## Priview
+https://github.com/user-attachments/assets/0a31ff22-1430-4d8b-9d87-303e9b43fdbf
+
+
 
 
 ## Waybar 
