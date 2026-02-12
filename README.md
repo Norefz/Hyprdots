@@ -24,6 +24,21 @@
 - **Audio Management**: pamixer, pipewire
 - **Network Management**: NetworkManager (nmcli), iwd (iNet Wireless Daemon)
 
+## Waybar 
+![waybar](https://github.com/user-attachments/assets/59197883-6ce6-4acf-98d5-80b7889149b8)
+
+## Rofi Menu
+![rofi](https://github.com/user-attachments/assets/47f3760b-0d47-4eaf-a09a-50d895f53218)
+
+## Rofi WallChanger
+![rofi wallpaper changer](https://github.com/user-attachments/assets/91dda0d1-453b-4464-8975-2ad1a35ff89b)
+
+## Ranger
+![ranger](https://github.com/user-attachments/assets/265945a7-197f-4073-b161-3c49ce6f6d78)
+
+## 
+
+
 
 ## 🛠️ Installation Steps
 
