@@ -60,7 +60,23 @@ https://github.com/user-attachments/assets/0a31ff22-1430-4d8b-9d87-303e9b43fdbf
 
 ## 
 
+---
 
+## ⚠️ Important Notice (Read Before Running Setup)
+
+> ### **Warning:**
+>
+> This setup script will **move your existing config files** (e.g., for Waybar, Kitty, Hyprland, etc.) to a backup folder at `~/.config_backup`. Then, it will copy the new configs from this repo into your `~/.config` directory.
+>
+> ### What this means:
+>
+> - Your current setup will be **replaced**.
+> - If you have customizations you care about, **back them up manually** or review the script before running.
+> - Fonts and themes will be installed system-wide in your `~/.local/share/fonts` directory.
+
+---
+
+---
 
 ## 🛠️ Installation Steps
 
@@ -83,23 +99,7 @@ https://github.com/user-attachments/assets/0a31ff22-1430-4d8b-9d87-303e9b43fdbf
    ```
 
 
----
 
-## ⚠️ Important Notice (Read Before Running Setup)
-
-> ### **Warning:**
->
-> This setup script will **move your existing config files** (e.g., for Waybar, Kitty, Hyprland, etc.) to a backup folder at `~/.config_backup`. Then, it will copy the new configs from this repo into your `~/.config` directory.
->
-> ### What this means:
->
-> - Your current setup will be **replaced**.
-> - If you have customizations you care about, **back them up manually** or review the script before running.
-> - Fonts and themes will be installed system-wide in your `~/.local/share/fonts` directory.
-
----
-
----
 
 
 ## Keybindings
