@@ -101,7 +101,6 @@ https://github.com/user-attachments/assets/0a31ff22-1430-4d8b-9d87-303e9b43fdbf
 
 
 
-
 ## Keybindings
 
 ## ⌨️ Keybindings
@@ -111,7 +110,7 @@ These dotfiles use **SUPER** (Windows Key) as the main modifier (`$mainMod`).
 ### 🖥️ System & Management
 | Shortcut | Action |
 | :--- | :--- |
-| <kbd>⌘</kbd> + <kbd>Space</kbd> | Launch App Launcher (Rofi) |
+| <kbd>⌘</kbd> + <kbd>D</kbd> | Launch App Launcher (Rofi) |
 | <kbd>⌘</kbd> + <kbd>W</kbd> | Open Wallpaper Picker |
 | <kbd>⌘</kbd> + <kbd>R</kbd> | Randomize Wallpaper & Colors (Pywal) |
 | <kbd>⌘</kbd> + <kbd>Shift</kbd> + <kbd>C</kbd> | Restart Waybar & Reload Hyprland |
